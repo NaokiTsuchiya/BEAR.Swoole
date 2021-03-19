@@ -89,4 +89,10 @@ class BootstrapTest extends TestCase
 }
 ', (string) $response->getBody());
     }
+
+    public function testPostRequest(): void
+    {
+        $response = $this->client->post('/', ['http_errors' => false, 'headers' => ['Content-Type' => 'application/json']]);
+        $this->assertSame(405, $response->getStatusCode());
+    }
 }
