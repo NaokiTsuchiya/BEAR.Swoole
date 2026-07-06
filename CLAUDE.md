@@ -48,6 +48,7 @@ Tests require a running Swoole server. The test bootstrap (`tests/bootstrap.php`
 This library uses Swoole coroutine context instead of PHP superglobals for request isolation:
 
 - `SwooleRequestProvider::seed()` stores raw Swoole request in coroutine context
+- `Responder::seed()` stores raw Swoole response in coroutine context; `Responder` is stateless, so the instance shared across concurrent request coroutines cannot mix responses between clients
 - `SwooleRequestProxy` implements `ServerRequestInterface` as a lazy proxy that retrieves the actual PSR-7 request from coroutine context on demand
 - `SwooleServerRequestConverter` converts Swoole request to PSR-7 `ServerRequestInterface` (conversion happens lazily only when PSR-7 is actually needed)
 - Parent coroutine context is searched if current context lacks request data

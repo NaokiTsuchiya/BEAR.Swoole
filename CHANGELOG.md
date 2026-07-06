@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+- `Responder::seed()` to store the raw Swoole response in the coroutine context.
+- `ResponseNotSeededException`, thrown when `Responder` is invoked without a seeded response.
+
+### Fixed
+- Cross-client response mixing under concurrent requests: `Responder` held the Swoole response as shared mutable state, so a coroutine yield during rendering (e.g. lazy `#[Embed]` evaluation) could send one client's response to another client's connection. The response now travels via the coroutine context, like the request.
+
+### Removed
+- `Responder::setResponse()` (non-coroutine-safe; replaced by `Responder::seed()`).
+
 ## [0.7.1] - 2026-07-06
 
 ### Fixed

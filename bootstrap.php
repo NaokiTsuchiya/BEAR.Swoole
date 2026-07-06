@@ -5,6 +5,7 @@ declare(strict_types=1);
 use BEAR\AppMeta\Meta;
 use BEAR\Package\Module;
 use BEAR\Swoole\App;
+use BEAR\Swoole\Responder;
 use BEAR\Swoole\SwooleModule;
 use BEAR\Resource\Method;
 use BEAR\Swoole\SwooleRequestProvider;
@@ -36,6 +37,7 @@ return static function (string $context, string $name, string $ip, int $port, ar
     $http->on('request', static function (Request $request, Response $response) use ($app): void {
         // Seed the context for potential PSR-7 use. Conversion is lazy.
         $server = SwooleRequestProvider::seed($request);
+        Responder::seed($response);
 
         try {
             // Check ETag from coroutine context directly.
@@ -55,7 +57,6 @@ return static function (string $context, string $name, string $ip, int $port, ar
 
             $ro = $app->resource->newRequest(Method::from($match->method), $match->path, $match->query)();
 
-            $app->responder->setResponse($response);
             $ro->transfer($app->responder, []);
 
         } catch (Throwable $e) {
