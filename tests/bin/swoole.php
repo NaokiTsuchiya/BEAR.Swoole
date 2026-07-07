@@ -9,5 +9,5 @@ exit((require dirname(__DIR__, 2) . '/bootstrap.php')(
     'BEAR\Skeleton',  // application name
     '127.0.0.1',      // IP
     8088,             // port
-    ['worker_num' => 1], // single worker makes coroutine interleaving deterministic for race tests
+    ['worker_num' => 1], // single worker forces concurrent requests through the shared instance so the race can occur
 ));

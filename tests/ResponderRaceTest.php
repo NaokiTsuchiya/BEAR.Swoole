@@ -30,14 +30,16 @@ class ResponderRaceTest extends TestCase
      *
      * The /slow resource embeds a sub-resource whose onGet performs
      * coroutine-hooked I/O, so rendering yields inside toString() while the
-     * response is being transferred. Each client must still receive the body
-     * for its own request.
+     * response is being transferred. If the response were shared instance
+     * state, a concurrent request would corrupt it during that yield, surfacing
+     * as a 500 or a mismatched body. Each client must still receive its own.
      */
     public function testConcurrentRequestsDoNotMixResponses(): void
     {
         // Warm up the route first: cold-start class loading blocks the worker
         // without yielding, which masks the coroutine interleaving under test.
-        $this->client->get('/slow?id=warmup');
+        $warmup = $this->client->get('/slow?id=warmup');
+        $this->assertSame(200, $warmup->getStatusCode(), (string) $warmup->getBody());
 
         $promiseA = $this->client->getAsync('/slow?id=A');
         $promiseB = $this->client->getAsync('/slow?id=B');
